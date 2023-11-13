@@ -4,12 +4,19 @@ from flask import Flask,request,redirect,url_for,render_template,abort
 app = Flask(__name__)
 
 
-# @app.before_request
-# def check_locale():
-#     path = request.path
-#     if '.' not in path and path not in ('/','/en','/fr','/404'):
-#         abort(404)
-    
+@app.before_request
+def check_locale():
+    path = request.path
+    if '.' not in path and path not in ('/','/en','/fr','/404') and not request.headers.get('Hx-Request'):
+        abort(404)
+
+
+@app.context_processor
+def translate():
+    def t(k):
+        return {'key':'value'}.get(k)
+    return {'t':t}
+
 
 @app.get('/')
 def index():
@@ -28,11 +35,6 @@ def page_not_found(error):
 
 @app.post('/clicked')
 def clicked():
-    for e in dir(request):
-        print(e)
-    print()
-    print(request.method)
-
     return '<h1>clicked</h1>'
 
 
